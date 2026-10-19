@@ -1,0 +1,7 @@
+Companies may specify minimum CGPA, maximum active backlogs, and permitted departments.
+
+A student must satisfy all three criteria for a company.
+
+The project uses a CGPA scale from zero to ten. Supported departments are CSE, IT, ECE, and MECH.
+
+Meeting eligibility does not guarantee an interview or employment.

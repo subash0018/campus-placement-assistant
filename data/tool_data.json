@@ -1,0 +1,30 @@
+[
+  {
+    "company": "AlphaSoft",
+    "min_cgpa": 7.0,
+    "max_backlogs": 0,
+    "departments": [
+      "CSE",
+      "IT"
+    ]
+  },
+  {
+    "company": "CircuitWorks",
+    "min_cgpa": 6.5,
+    "max_backlogs": 1,
+    "departments": [
+      "CSE",
+      "IT",
+      "ECE"
+    ]
+  },
+  {
+    "company": "BuildCore",
+    "min_cgpa": 6.0,
+    "max_backlogs": 0,
+    "departments": [
+      "MECH",
+      "ECE"
+    ]
+  }
+]

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Campus Placement Assistant</title>
+  <style>
+    :root { color-scheme: light; --ink:#182230; --muted:#586579; --line:#dce3ed; --blue:#2457c5; --bg:#f4f7fb; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif; }
+    header { background:#152b50; color:white; padding:28px 18px; }
+    header .wrap, main { max-width:900px; margin:auto; }
+    h1 { margin:0 0 6px; font-size:clamp(1.5rem,4vw,2.2rem); }
+    header p { margin:0; color:#dce7ff; }
+    main { padding:22px 14px 48px; }
+    .card { background:white; border:1px solid var(--line); border-radius:14px; padding:20px; margin-bottom:18px; box-shadow:0 4px 14px #152b5008; }
+    h2 { margin:0 0 12px; font-size:1.2rem; }
+    label { display:block; font-weight:650; margin:12px 0 5px; }
+    input, select, textarea { width:100%; padding:11px 12px; border:1px solid #c6d0df; border-radius:8px; font:inherit; background:white; }
+    button { margin-top:14px; border:0; border-radius:8px; background:var(--blue); color:white; font:inherit; font-weight:700; padding:11px 16px; cursor:pointer; }
+    button:hover { filter:brightness(.93); }
+    .result { background:#f7f9ff; border-left:4px solid var(--blue); padding:14px; border-radius:6px; margin-top:14px; overflow-wrap:anywhere; }
+    .error { background:#fff1f0; border-left-color:#c62828; }
+    .muted { color:var(--muted); font-size:.92rem; }
+    ul { padding-left:22px; }
+    .company { border:1px solid var(--line); border-radius:8px; padding:12px; margin:8px 0; }
+    .company strong { display:block; }
+    footer { text-align:center; color:var(--muted); font-size:.85rem; padding:8px 16px 28px; }
+  </style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Campus Placement Assistant</h1>
+  <p>Ask placement-policy questions or match your academic profile to the fictional company criteria.</p>
+</div></header>
+<main>
+  {% if error %}
+  <section class="card"><div class="result error"><strong>Input or application error</strong><p>{{ error }}</p></div></section>
+  {% endif %}
+
+  <section class="card">
+    <h2>Ask a placement question</h2>
+    <form method="post">
+      <input type="hidden" name="action" value="ask_question">
+      <label for="question">Your question</label>
+      <textarea id="question" name="question" rows="3" required placeholder="Example: What should I do if I cannot attend an interview?">{{ question }}</textarea>
+      <button type="submit">Ask assistant</button>
+    </form>
+    {% if answer %}
+      <div class="result"><strong>Answer</strong><p>{{ answer }}</p></div>
+      <h3>Retrieved documents</h3>
+      {% if sources %}<ul>{% for source in sources %}<li>{{ source }}</li>{% endfor %}</ul>
+      {% else %}<p class="muted">No source documents were retrieved.</p>{% endif %}
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Match companies to your profile</h2>
+    <p class="muted">All three criteria—minimum CGPA, maximum active backlogs, and permitted department—must be satisfied.</p>
+    <form method="post">
+      <input type="hidden" name="action" value="match_companies">
+      <label for="cgpa">CGPA (0–10)</label>
+      <input id="cgpa" name="cgpa" type="number" min="0" max="10" step="0.01" required value="{{ form_values.cgpa }}" placeholder="e.g. 7.5">
+      <label for="active_backlogs">Active backlogs</label>
+      <input id="active_backlogs" name="active_backlogs" type="number" min="0" step="1" required value="{{ form_values.active_backlogs }}" placeholder="e.g. 0">
+      <label for="department">Department</label>
+      <select id="department" name="department" required>
+        <option value="">Select department</option>
+        {% for dept in ["CSE", "IT", "ECE", "MECH"] %}
+        <option value="{{ dept }}" {% if form_values.department|upper == dept %}selected{% endif %}>{{ dept }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Match companies</button>
+    </form>
+    {% if tool_result %}
+      <div class="result">
+        <h3>Eligible companies</h3>
+        {% if tool_result.eligible_companies %}
+          <ul>{% for company in tool_result.eligible_companies %}<li>{{ company }}</li>{% endfor %}</ul>
+        {% else %}<p>None of the listed companies match all criteria.</p>{% endif %}
+        <h3>Ineligible companies and reasons</h3>
+        {% if tool_result.ineligible_companies %}
+          {% for item in tool_result.ineligible_companies %}
+          <div class="company"><strong>{{ item.company }}</strong><ul>{% for reason in item.reasons %}<li>{{ reason }}</li>{% endfor %}</ul></div>
+          {% endfor %}
+        {% else %}<p>All listed companies match the supplied profile.</p>{% endif %}
+        <p class="muted">{{ tool_result.notice }}</p>
+      </div>
+    {% endif %}
+  </section>
+</main>
+<footer>Fictional classroom eligibility rules. Final recruitment decisions belong to the hiring company.</footer>
+</body>
+</html>
