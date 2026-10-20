@@ -5,7 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
 
 load_dotenv()
@@ -26,8 +26,8 @@ def main():
             "Missing knowledge document(s): " + ", ".join(missing) +
             ". Put all three .txt files in the data/ folder."
         )
-    if not os.getenv("OPENAI_API_KEY"):
-        raise EnvironmentError("OPENAI_API_KEY is missing. Add it to your .env file.")
+    if not os.getenv("GOOGLE_API_KEY"):
+        raise EnvironmentError("GOOGLE_API_KEY is missing. Add it to your .env file.")
 
     documents = []
     for filename in EXPECTED_FILES:
@@ -45,9 +45,15 @@ def main():
     chunks = splitter.split_documents(documents)
     # Rebuild the collection so repeated ingestion cannot accumulate duplicate chunks.
     if CHROMA_DIR.exists():
-        shutil.rmtree(CHROMA_DIR)
+        try:
+            shutil.rmtree(CHROMA_DIR)
+        except PermissionError as exc:
+            raise RuntimeError(
+                f"Cannot delete the ChromaDB directory: {CHROMA_DIR}\n"
+                "close all applications using ChromaDB, then try again."
+            ) from exc
 
-    embeddings = OpenAIEmbeddings(model=os.getenv("EMBEDDING_MODEL", "text-embedding-3-small"))
+    embeddings = GoogleGenerativeAIEmbeddings(model=os.getenv("EMBEDDING_MODEL", "gemini-embedding-001"))
     Chroma.from_documents(
         documents=chunks,
         embedding=embeddings,

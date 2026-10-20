@@ -3,4 +3,5 @@
 __pycache__/
 *.py[cod]
 chroma_db/
+chroma_db_backup/
 .pytest_cache/

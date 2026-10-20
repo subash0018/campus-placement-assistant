@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import TypedDict, Any
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI , GoogleGenerativeAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langgraph.graph import StateGraph, START, END
@@ -27,7 +27,7 @@ class AssistantState(TypedDict, total=False):
 def _get_vector_store():
     if not CHROMA_DIR.exists():
         raise RuntimeError("ChromaDB is not initialized. Run `python ingest.py` first.")
-    embeddings = OpenAIEmbeddings(model=os.getenv("EMBEDDING_MODEL", "text-embedding-3-small"))
+    embeddings = GoogleGenerativeAIEmbeddings(model=os.getenv("EMBEDDING_MODEL", "gemini-embedding-001"))
     return Chroma(
         collection_name=COLLECTION_NAME,
         persist_directory=str(CHROMA_DIR),
@@ -66,8 +66,8 @@ Reference context:
 {context}"""),
         ("human", "Question: {question}")
     ])
-    model = ChatOpenAI(
-        model=os.getenv("CHAT_MODEL", "gpt-4o-mini"),
+    model = ChatGoogleGenerativeAI(
+        model=os.getenv("CHAT_MODEL", "gemini-3.5-flash"),
         temperature=0,
     )
     chain = prompt | model | StrOutputParser()
