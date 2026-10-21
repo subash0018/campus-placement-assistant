@@ -78,7 +78,7 @@ python app.py
 Open the local address printed in the terminal (normally `http://127.0.0.1:5000`).
 
 ## Demo questions
-
+npc
 - Does eligibility guarantee employment?
 - What should I do if I cannot attend an interview?
 - What should students do before participating in recruitment?

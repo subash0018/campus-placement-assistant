@@ -1,6 +1,5 @@
 """Load the three placement knowledge files and persist their chunks in ChromaDB."""
 import os
-import shutil
 from pathlib import Path
 
 try:
@@ -76,23 +75,17 @@ def main():
         separators=["\n\n", "\n", ". ", " ", ""],
     )
     chunks = splitter.split_documents(documents)
-    # Rebuild the collection so repeated ingestion cannot accumulate duplicate chunks.
-    if CHROMA_DIR.exists():
-        try:
-            shutil.rmtree(CHROMA_DIR)
-        except PermissionError as exc:
-            raise RuntimeError(
-                f"Cannot delete the ChromaDB directory: {CHROMA_DIR}\n"
-                "close all applications using ChromaDB, then try again."
-            ) from exc
-
     embeddings = _build_embeddings()
-    Chroma.from_documents(
-        documents=chunks,
-        embedding=embeddings,
-        persist_directory=str(CHROMA_DIR),
+    store = Chroma(
         collection_name=COLLECTION_NAME,
+        persist_directory=str(CHROMA_DIR),
+        embedding_function=embeddings,
     )
+    existing_ids = store.get()["ids"]
+    if existing_ids:
+        store.delete(ids=existing_ids)
+    store.add_documents(chunks)
+
     print(f"Ingestion complete: {len(documents)} documents -> {len(chunks)} chunks.")
     print(f"ChromaDB stored at: {CHROMA_DIR}")
 
