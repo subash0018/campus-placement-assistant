@@ -1,9 +1,12 @@
 .env
 .venv/
+
 __pycache__/
 *.py[cod]
+
 chroma_db/
 chroma_db_backup/
 chroma_db_old/
 chroma_db_old_copy/
+
 .pytest_cache/
