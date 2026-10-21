@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# Learn more about building a configuration: https://promptfoo.dev/docs/configuration/guide
+
+# Promptfoo configuration for Campus Placement Assistant
+
+
+description: "Campus Placement Assistant Evaluation"
+
+prompts:
+  - "{{question}}"
+
+providers:
+  - id: "file://provider.py"
+
+tests:
+  - vars:
+      question: "What are the eligibility criteria for campus placement?"
+
+  - vars:
+      question: "What is the minimum CGPA required for placement?"
+
+  - vars:
+      question: "What documents are required for campus placement?"
+
+  - vars:
+      question: "How should I prepare for a technical interview?"
+
+  - vars:
+      question: "What is the placement package offered by the company?"
